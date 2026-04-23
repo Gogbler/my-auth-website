@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Auth Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-400 to-purple-600 min-h-screen flex flex-col">
+    
+    <!-- Navbar -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-lg">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                🔐 My Auth App
+            </h1>
+        </div>
+    </nav>
+
+    <div class="flex-1 flex items-center justify-center p-8">
+        <!-- Login Form -->
+        <div id="loginForm" class="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-12 space-y-6">
+            <div class="text-center">
+                <h2 class="text-4xl font-bold text-gray-800 mb-2">Welcome Back!</h2>
+                <p class="text-gray-600">Sign in to continue</p>
+            </div>
+            
+            <div id="loginError" class="hidden bg-red-100 border border-red-400 text-red-700 p-4 rounded-2xl"></div>
+            
+            <form id="login">
+                <input id="loginEmail" type="email" placeholder="Email" class="w-full p-4 border border-gray-300 rounded-2xl text-lg focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all" required>
+                <input id="loginPassword" type="password" placeholder="Password" class="w-full p-4 border border-gray-300 rounded-2xl text-lg focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all" required>
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-2xl text-xl font-bold hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">Sign In</button>
+            </form>
+            
+            <div class="text-center pt-4 border-t">
+                <button onclick="showRegister()" class="text-blue-600 hover:text-blue-800 font-semibold">Create new account</button>
+            </div>
+        </div>
+
+        <!-- Register Form (Hidden) -->
+        <div id="registerForm" class="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-12 space-y-6 hidden">
+            <div class="text-center">
+                <h2 class="text-4xl font-bold text-gray-800 mb-2">Create Account</h2>
+                <p class="text-gray-600">Join us today</p>
+            </div>
+            
+            <div id="registerError" class="hidden bg-red-100 border border-red-400 text-red-700 p-4 rounded-2xl"></div>
+            
+            <form id="register">
+                <input id="regName" type="text" placeholder="Full Name" class="w-full p-4 border border-gray-300 rounded-2xl text-lg focus:ring-4 focus:ring-green-200" required>
+                <input id="regEmail" type="email" placeholder="Email" class="w-full p-4 border border-gray-300 rounded-2xl text-lg focus:ring-4 focus:ring-green-200" required>
+                <input id="regPassword" type="password" placeholder="Password" class="w-full p-4 border border-gray-300 rounded-2xl text-lg focus:ring-4 focus:ring-green-200" required>
+                <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white p-4 rounded-2xl text-xl font-bold hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">Create Account</button>
+            </form>
+            
+            <div class="text-center pt-4 border-t">
+                <button onclick="showLogin()" class="text-blue-600 hover:text-blue-800 font-semibold">Already have account? Login</button>
+            </div>
+        </div>
+
+        <!-- Dashboard (Hidden) -->
+        <div id="dashboard" class="w-full max-w-2xl bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-12 hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
+                    🎉 Welcome Back!
+                </h2>
+                <div id="userInfo" class="bg-gradient-to-r from-green-50 to-emerald-50 p-8 rounded-2xl">
+                    <p id="userName" class="text-2xl font-bold text-gray-800"></p>
+                    <p id="userEmail" class="text-lg text-gray-600"></p>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-blue-50 p-8 rounded-2xl text-center">
+                    <div class="text-4xl mb-4">🔐</div>
+                    <h3 class="text-xl font-bold text-blue-800 mb-2">Real Authentication</h3>
+                    <p class="text-blue-600">JWT Protected</p>
+                </div>
+                <div class="bg-green-50 p-8 rounded-2xl text-center">
+                    <div class="text-4xl mb-4">🗄️</div>
+                    <h3 class="text-xl font-bold text-green-800 mb-2">MongoDB Database</h3>
+                    <p class="text-green-600">Live & Persistent</p>
+                </div>
+                <div class="bg-purple-50 p-8 rounded-2xl text-center">
+                    <div class="text-4xl mb-4">🚀</div>
+                    <h3 class="text-xl font-bold text-purple-800 mb-2">Production Deployed</h3>
+                    <p class="text-purple-600">Vercel Serverless</p>
+                </div>
+            </div>
+            
+            <button onclick="logout()" class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white p-4 rounded-2xl text-xl font-bold hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        function showMessage(id, message, isError = false) {
+            const el = document.getElementById(id);
+            el.textContent = message;
+            el.classList.remove('hidden');
+            el.className = `p-4 rounded-2xl ${isError ? 'bg-red-100 border border-red-400 text-red-700' : 'bg-green-100 border border-green-400 text-green-700'}`;
+            setTimeout(() => el.classList.add('hidden'), 5000);
+        }
+
+        async function callAPI(action, data) {
+            try {
+                const response = await fetch('/api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, ...data })
+                });
+                return await response.json();
+            } catch (error) {
+                return { success: false, message: 'Network error. Check MongoDB connection.' };
+            }
+        }
+
+        // Login
+        document.getElementById('login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const result = await callAPI('login', { email, password });
+            if (result.success) {
+                currentUser = result.user;
+                showDashboard();
+            } else {
+                showMessage('loginError', result.message, true);
+            }
+        });
+
+        // Register
+        document.getElementById('register').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            const result = await callAPI('register', { name, email, password });
+            if (result.success) {
+                currentUser = { name, email };
+                showDashboard();
+            } else {
+                showMessage('registerError', result.message, true);
+            }
+        });
+
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.querySelectorAll('input').forEach(input => input.value = '');
+        }
+    </script>
+</body>
+</html>
